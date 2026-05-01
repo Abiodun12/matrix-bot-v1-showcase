@@ -6,6 +6,22 @@ Matrix Bot v1 is a Go-based execution stack built around Polymarket-style centra
 
 This public repository is a sanitized project overview. The live trading implementation, deployment runbooks, strategy logic, and private operational details are not published here.
 
+## Public Code Included
+
+This repo includes a small venue-neutral code sample:
+
+- `pkg/oms`: deterministic desired-vs-open order reconciliation
+- `pkg/latency`: percentile summaries for runtime latency samples
+- `cmd/showcase`: demo CLI showing the public components
+- `docs/ARCHITECTURE.md`: high-level system diagram
+
+Run it locally:
+
+```bash
+go test ./...
+go run ./cmd/showcase
+```
+
 ## What It Demonstrates
 
 Most trading bots stop at "fetch book, place order." Matrix Bot v1 focuses on everything that has to work after orders are live:
