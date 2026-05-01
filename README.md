@@ -117,9 +117,11 @@ Matrix Bot v1 was built as a live-tested execution platform for those problems.
 
 ## Access
 
-The full implementation is private.
+The full implementation is private. This public repository is only a sanitized technical showcase.
 
-For commercial access, collaboration, or technical due diligence, contact the repository owner through GitHub.
+For full access, commercial licensing, technical due diligence, or private walkthroughs, contact the repository owner through GitHub.
+
+I am also open to collaboration on new prediction-market infrastructure, execution systems, market-data tooling, and venue integrations.
 
 ## Status
 
