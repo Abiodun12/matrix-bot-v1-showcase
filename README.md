@@ -1,46 +1,38 @@
 # Matrix Bot v1
 
-Live-tested CLOB execution infrastructure for prediction markets.
+**Live-tested CLOB execution infrastructure for prediction markets.**
 
-Matrix Bot v1 is a Go-based execution stack built around Polymarket-style central limit order book markets. It was designed to solve the hard part of automated prediction-market trading: ingesting fast market data, managing live orders safely, enforcing runtime risk controls, and producing auditable post-trade records.
+Matrix Bot v1 is a Go-based execution stack built for Polymarket-style central limit order book markets. It is not a toy "fetch book, place order" script. It is an execution platform with market-data ingestion, order reconciliation, runtime risk controls, post-trade accounting, and audit tooling.
 
-This public repository is a sanitized project overview. The live trading implementation, deployment runbooks, strategy logic, and private operational details are not published here.
+This public repo is a sanitized technical showcase. The private implementation includes the live venue integration, strategy gates, deployment runbooks, and operational tooling.
 
-## Public Code Included
+## At A Glance
 
-This repo includes a small venue-neutral code sample:
+| Area | Built |
+|---|---|
+| Language | Go |
+| Market data | WebSocket ingestion, deduplication, freshness checks, replay captures |
+| Execution | Signed order flow, open-order reconciliation, cancel/replace loop |
+| Risk | Explicit live arming, cancel-only mode, max-fill caps, reduce-only unwind |
+| Accounting | User-fill tracking, position sync, realized PnL, final audit |
+| Research | Markouts, shadow mode, queue probes, evidence scorecards |
+| Public sample | Venue-neutral book, OMS reconciler, latency stats, runnable CLI |
 
-- `pkg/oms`: deterministic desired-vs-open order reconciliation
-- `pkg/book`: venue-neutral order book updates, top-of-book, and freshness checks
-- `pkg/latency`: percentile summaries for runtime latency samples
-- `cmd/showcase`: demo CLI showing the public components
-- `docs/ARCHITECTURE.md`: high-level system diagram
+## Why This Is Interesting
 
-Run it locally:
+Most trading bots are scripts. Matrix Bot v1 was built around the real failure modes of live CLOB execution:
 
-```bash
-go test ./...
-go run ./cmd/showcase
-```
+- Market data can be stale.
+- Open orders can drift away from current intent.
+- Duplicate exposure can happen if reconciliation is sloppy.
+- Fills can arrive asynchronously through user streams.
+- Local position state can disagree with venue truth.
+- A bot needs to stop taking new risk before it tries to flatten.
+- Every live session needs a final audit.
 
-## What It Demonstrates
+The system was designed around those problems from the beginning.
 
-Most trading bots stop at "fetch book, place order." Matrix Bot v1 focuses on everything that has to work after orders are live:
-
-- WebSocket-first market-data ingestion
-- Authenticated order routing
-- OMS cancel/replace reconciliation
-- Explicit paper/live arming controls
-- Cancel-only safety mode
-- Max-fill and max-runtime risk caps
-- Reduce-only unwind behavior
-- Position reconciliation
-- User-fill tracking
-- Realized PnL accounting
-- Final REST-based trade audit
-- Replayable logs for research and postmortems
-
-## Observed Runtime Metrics
+## Runtime Evidence
 
 Measured from runtime/live logs:
 
@@ -58,7 +50,55 @@ Measured from runtime/live logs:
 
 These are operational measurements from the system's logs. They are not a claim of sub-millisecond end-to-end order execution latency.
 
-## System Areas
+## Public Code Included
+
+This repo includes a small, venue-neutral sample of the engineering style:
+
+- `pkg/book`: order book deltas, sorted levels, top-of-book, spread, freshness checks
+- `pkg/oms`: deterministic desired-vs-open order reconciliation
+- `pkg/latency`: percentile summaries for runtime latency samples
+- `cmd/showcase`: runnable CLI tying the samples together
+- `docs/ARCHITECTURE.md`: high-level system diagram
+
+Run it locally:
+
+```bash
+go test ./...
+go run ./cmd/showcase
+```
+
+Example output:
+
+```text
+Top of book: bid=716 ask=718 spread=2 fresh=true
+
+OMS reconcile plan
+- cancel reason=duplicate_or_stale order=ord-1 desired=btc-5m:no:buy
+- post   reason=stale_replace order= desired=btc-5m:no:buy
+- cancel reason=not_desired order=ord-2 desired=
+- post   reason=missing order= desired=btc-5m:yes:sell
+
+Latency sample: count=5 p50=31ms p95=45ms max=46ms
+```
+
+## System Design
+
+```mermaid
+flowchart LR
+    A["Market WebSocket"] --> B["Book State"]
+    B --> C["Quote Engine"]
+    C --> D["OMS Reconciler"]
+    D --> E["Order Router"]
+    E --> F["Venue REST API"]
+    G["User WebSocket"] --> H["Fill Tracker"]
+    H --> I["Position + PnL"]
+    F --> I
+    I --> J["Final Audit"]
+    B --> K["Replay Logs"]
+    H --> K
+```
+
+## Engineering Highlights
 
 ### Market Data
 
@@ -109,19 +149,13 @@ These are operational measurements from the system's logs. They are not a claim 
 - Evidence scorecards
 - Replayable JSONL captures
 
-## Why It Exists
-
-Prediction-market execution is fragile. A bot needs to know when market data is stale, when an order is no longer desired, when inventory has moved, when to stop taking new risk, and whether final venue activity matches the local ledger.
-
-Matrix Bot v1 was built as a live-tested execution platform for those problems.
-
-## Access
+## Access And Collaboration
 
 The full implementation is private. This public repository is only a sanitized technical showcase.
 
 For full access, commercial licensing, technical due diligence, or private walkthroughs, contact the repository owner through GitHub.
 
-I am also open to collaboration on new prediction-market infrastructure, execution systems, market-data tooling, and venue integrations.
+I am open to collaboration on new prediction-market infrastructure, execution systems, market-data tooling, and venue integrations.
 
 ## Status
 
