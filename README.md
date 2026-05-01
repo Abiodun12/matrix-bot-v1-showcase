@@ -11,6 +11,7 @@ This public repository is a sanitized project overview. The live trading impleme
 This repo includes a small venue-neutral code sample:
 
 - `pkg/oms`: deterministic desired-vs-open order reconciliation
+- `pkg/book`: venue-neutral order book updates, top-of-book, and freshness checks
 - `pkg/latency`: percentile summaries for runtime latency samples
 - `cmd/showcase`: demo CLI showing the public components
 - `docs/ARCHITECTURE.md`: high-level system diagram

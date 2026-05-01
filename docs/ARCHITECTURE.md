@@ -22,6 +22,7 @@ flowchart LR
 The code in this repository is intentionally small:
 
 - `pkg/oms`: venue-neutral order reconciliation example
+- `pkg/book`: venue-neutral order book and freshness example
 - `pkg/latency`: latency percentile utilities
 - `cmd/showcase`: CLI demo of the public components
 

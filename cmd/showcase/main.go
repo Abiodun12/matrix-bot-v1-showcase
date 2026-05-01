@@ -4,11 +4,22 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/Abiodun12/matrix-bot-v1-showcase/pkg/book"
 	"github.com/Abiodun12/matrix-bot-v1-showcase/pkg/latency"
 	"github.com/Abiodun12/matrix-bot-v1-showcase/pkg/oms"
 )
 
 func main() {
+	b := book.New()
+	now := time.Now()
+	b.Apply(now,
+		book.Delta{Side: book.Bid, Price: 715, Size: 500},
+		book.Delta{Side: book.Bid, Price: 716, Size: 300},
+		book.Delta{Side: book.Ask, Price: 718, Size: 250},
+	)
+	top := b.Top()
+	fmt.Printf("Top of book: bid=%d ask=%d spread=%d fresh=%v\n\n", top.BidPrice, top.AskPrice, top.Spread, b.Fresh(now, time.Second))
+
 	actions := oms.Reconcile(
 		[]oms.DesiredOrder{
 			{Key: "btc-5m:no:buy", Side: "buy", Price: 716, Size: 500},
