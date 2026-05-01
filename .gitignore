@@ -1,0 +1,14 @@
+.DS_Store
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.log
+*.jsonl
+*.db
+*.sqlite
+node_modules/
+dist/
+build/
+bin/
